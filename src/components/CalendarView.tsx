@@ -16,26 +16,11 @@ import { Game } from '../types';
 
 interface CalendarViewProps {
   games: Game[];
-  onNavigateToEdit: () => void;
 }
 
-const CalendarView: React.FC<CalendarViewProps> = ({ games, onNavigateToEdit }) => {
+const CalendarView: React.FC<CalendarViewProps> = ({ games }) => {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   
-  // 管理者モードの判定 (URLクエリ `?admin=1` または ヘッダートリプルクリック)
-  const [isAdmin, setIsAdmin] = useState<boolean>(() => {
-    // URLからクエリパラメータを取得
-    const params = new URLSearchParams(window.location.search);
-    return params.get('admin') === '1';
-  });
-
-  const handleTitleClick = (e: React.MouseEvent) => {
-    // 連続クリック数 (e.detail) を判定し、3回以上クリックされたら管理者モードをONにする
-    if (e.detail >= 3) {
-      setIsAdmin(true);
-    }
-  };
-
   const nextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
   const prevMonth = () => setCurrentMonth(subMonths(currentMonth, 1));
   const goToToday = () => setCurrentMonth(new Date());
@@ -57,11 +42,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ games, onNavigateToEdit }) 
       {/* ヘッダー */}
       <header className="bg-white shadow-sm border-b px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4 sticky top-0 z-10">
         <div className="flex items-center gap-4">
-          <h1 
-            onClick={handleTitleClick}
-            className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 cursor-default select-none"
-            title="ゲームカレンダー"
-          >
+          <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
             ゲームカレンダー
           </h1>
         </div>
@@ -97,15 +78,6 @@ const CalendarView: React.FC<CalendarViewProps> = ({ games, onNavigateToEdit }) 
             今日
           </button>
         </div>
-
-        {isAdmin && (
-          <button 
-            onClick={onNavigateToEdit}
-            className="px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-blue-600 rounded-lg hover:from-indigo-600 hover:to-blue-700 shadow-md hover:shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          >
-            データ編集
-          </button>
-        )}
       </header>
 
       {/* カレンダー本体 */}
