@@ -1,0 +1,35 @@
+name: Deploy React App to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main # mainブランチへのプッシュ（APIからのdata.json更新コミットも含む）でトリガー
+  workflow_dispatch: # 手動実行用
+
+# ワークフローにリポジトリへの書き込み権限を付与
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # 最新のLTSバージョンを指定
+
+      - name: Install Dependencies
+        run: npm ci # 確実にpackage-lock.json通りのバージョンをインストール
+
+      - name: Build Project
+        run: npm run build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist # Viteのデフォルト出力先
