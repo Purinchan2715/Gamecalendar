@@ -38,6 +38,20 @@ export const isHalfAnniversary = (targetDate: Date, releaseDate: Date): boolean 
  * @param games 全ゲームデータ
  * @returns イベントの配列
  */
+const resolveGameId = (game: Game): string => {
+  if (game.id) return game.id;
+  return `${game.title}-${game.releaseDate}`;
+};
+
+const getAnniversaryCount = (targetDate: Date, releaseDate: Date): number => {
+  return targetDate.getFullYear() - releaseDate.getFullYear();
+};
+
+const formatAnniversaryLabel = (count: number, isHalf: boolean): string => {
+  const value = isHalf ? count + 0.5 : count;
+  return `${value.toFixed(1).replace(/\.0$/, '')}周年`;
+};
+
 export const getEventsForDate = (targetDate: Date, games: Game[]): CalendarEvent[] => {
   const events: CalendarEvent[] = [];
 
@@ -46,24 +60,27 @@ export const getEventsForDate = (targetDate: Date, games: Game[]): CalendarEvent
     // ハイフン区切りだとUTC扱いになるブラウザの差異を防ぐため、安全にパース
     const [year, month, day] = game.releaseDate.split('-').map(Number);
     const releaseDateObj = new Date(year, month - 1, day);
+    const gameId = resolveGameId(game);
 
     // アニバーサリー判定
     if (isAnniversary(targetDate, releaseDateObj)) {
+      const anniversaryCount = getAnniversaryCount(targetDate, releaseDateObj);
       events.push({
-        gameId: game.id,
+        gameId,
         title: game.title,
         type: 'anniversary',
-        label: `${game.title} 周年`
+        label: `${game.title} ${formatAnniversaryLabel(anniversaryCount, false)}`
       });
     }
 
     // ハーフアニバーサリー判定
     if (isHalfAnniversary(targetDate, releaseDateObj)) {
+      const anniversaryCount = getAnniversaryCount(targetDate, releaseDateObj);
       events.push({
-        gameId: game.id,
+        gameId,
         title: game.title,
         type: 'half-anniversary',
-        label: `${game.title} ハーフ`
+        label: `${game.title} ${formatAnniversaryLabel(anniversaryCount, true)}`
       });
     }
   });
